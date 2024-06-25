@@ -1,54 +1,72 @@
 import { Request, Response } from "express"
 import { UserService } from "../services/user.service"
-import { error } from "console"
+import { CreateUserDto, CustomError } from "../../domain"
 
 
 export class UsersController {
 
   constructor(
     private readonly userService: UserService
-  ){
+  ) { }
 
+  private handleError = (error: any, res: Response) => {
+    if (error instanceof CustomError) {
+      return res.status(error.statusCode).json({ message: error.message })
+    }
+
+    console.log(error)
+    return res.status(500).json({ message: 'Something went very wrong' })
   }
 
   createUser = (req: Request, res: Response) => {
-    const { name, email, password, role } = req.body
+    const [error, createUserDto] = CreateUserDto.create(req.body)
+    if (error) return res.status(422).json({ message: error })
 
-    this.userService.createUser({ name, email, password, role })
-      .then((user) => {
-        res.status(201).json(user)
-      })
-      .catch((error) => {
-        res.status(500).json(error)
-      });
+    this.userService.createUser(createUserDto!)
+      .then((user) => res.status(201).json(user))
+      .catch((error: any) => this.handleError(error, res))
   }
 
   findAllUsers = (req: Request, res: Response) => {
-    res.status(200).json({ message: 'ok' })
+
+    this.userService.findAllUsers()
+      .then(users => res.status(200).json(users))
+      .catch((error: any) => this.handleError(error, res))
   }
 
   findOneUser = (req: Request, res: Response) => {
     const { id } = req.params
+    if (isNaN(+id)) {
+      res.status(400).json({ message: 'El id debe ser numerico' })
+    }
 
-    return res.status(200).json({
-      message: `Usuario con id ${id} listado`
-    })
+    this.userService.findOneUserById(+id)
+      .then(user => res.status(200).json(user))
+      .catch((error: any) => this.handleError(error, res))
   }
 
   updateUser = (req: Request, res: Response) => {
     const { id } = req.params
-    const { name, price, description } = req.body
+    const { name, email } = req.body
 
-    return res.status(200).json({
-      message: `Usuario con id ${id} actualizado`
-    })
+    if (isNaN(+id)) {
+      res.status(400).json({ message: 'El id debe ser numerico' })
+    }
+
+    this.userService.updateUser({ name, email }, +id)
+      .then(user => res.status(200).json(user))
+      .catch((error: any) => res.status(500).json(error))
   }
-  
+
   deleteUser = (req: Request, res: Response) => {
     const { id } = req.params
 
-    return res.status(204).json({
-      message: `Usuario con id ${id} eliminado`
-    })
+    if (isNaN(+id)) {
+      return res.status(400).json({ message: 'El id debe se un numero' })
+    }
+
+    this.userService.deleteUser(+id)
+      .then(() => res.status(204).json({ message: `Usuario con id ${id} eliminado` }))
+      .catch((error: any) => res.status(500).json(error))
   }
 }

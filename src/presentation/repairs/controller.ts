@@ -6,7 +6,7 @@ import { CreateRepairDto, CustomError } from "../../domain"
 export class RepairsController {
 
   constructor(
-    public readonly repairService: RepairsService
+    private readonly repairService: RepairsService
   ) { }
 
   private handleError = (error: any, res: Response) => {

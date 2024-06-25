@@ -14,7 +14,6 @@ enum Role {
 export class UserService {
 
   constructor() {
-
   }
 
   async createUser(userData: any) {
@@ -43,18 +42,44 @@ export class UserService {
 
   async findOneUserById(id: number) {
 
-    const repair = await Users.findOne({
+    const user = await Users.findOne({
       where: {
         id: id,
         status: Status.DISABLED
       }
     })
 
-    if (!repair) {
+    if (!user) {
       throw CustomError.notFound(`User with id ${id} not found`)
     }
 
-    return repair
+    return user
 
+  }
+
+  async updateUser(userData: any, id: number) {
+
+    const user = await this.findOneUserById(id)
+
+    user.name = userData.name.toLowerCase().trim()
+    user.email = userData.email.toLowerCase().trim()
+
+    try {
+      return await user.save()
+    } catch (error) {
+      throw CustomError.internalServer('Something went very wrong')
+    }
+  }
+
+  async deleteUser(id: number) {
+    const user = await this.findOneUserById(id)
+
+    user.status = Status.DISABLED
+
+    try {
+      await user.save()
+    } catch (error) {
+      throw CustomError.internalServer('Something went very wrong')
+    }
   }
 }

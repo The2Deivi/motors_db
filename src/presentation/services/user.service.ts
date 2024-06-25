@@ -1,5 +1,5 @@
 import { Users } from "../../data"
-import { CustomError } from "../../domain"
+import { CreateUserDto, CustomError, UpdateUserDto } from "../../domain"
 
 enum Status {
   AVAILABLE = 'AVAILABLE',
@@ -16,7 +16,7 @@ export class UserService {
   constructor() {
   }
 
-  async createUser(userData: any) {
+  async createUser(userData: CreateUserDto) {
     const user = new Users()
 
     user.name = userData.name.toLowerCase().trim()
@@ -57,7 +57,7 @@ export class UserService {
 
   }
 
-  async updateUser(userData: any, id: number) {
+  async updateUser(userData: UpdateUserDto, id: number) {
 
     const user = await this.findOneUserById(id)
 

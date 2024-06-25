@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { RepairsService } from "../services/repairs.service"
-import { CreateRepairDto, CustomError } from "../../domain"
+import { CreateRepairDto, CustomError, UpdateRepairDto } from "../../domain"
 
 
 export class RepairsController {
@@ -47,13 +47,15 @@ export class RepairsController {
 
   updateRepair = (req: Request, res: Response) => {
     const { id } = req.params
-    const { status } = req.body
+    const [error, updateRepairDto] = UpdateRepairDto.create(req.body)
 
     if (isNaN(+id)) {
       res.status(400).json({ message: 'El id debe ser numerico' })
     }
 
-    this.repairService.updateRepair({ status }, +id)
+    if (error) return res.status(422).json({ message: error })
+
+    this.repairService.updateRepair(updateRepairDto!, +id)
       .then(repair => res.status(200).json(repair))
       .catch((error: any) => res.status(500).json(error))
   }

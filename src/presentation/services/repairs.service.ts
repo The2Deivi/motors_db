@@ -1,5 +1,5 @@
 import { Repairs } from "../../data"
-import { CreateRepairDto, CustomError } from "../../domain"
+import { CreateRepairDto, CustomError, UpdateRepairDto } from "../../domain"
 
 
 enum Status {
@@ -57,7 +57,7 @@ export class RepairsService {
 
   }
 
-  async updateRepair(repairData: any, id: number) {
+  async updateRepair(repairData: UpdateRepairDto, id: number) {
 
     const repair = await this.findOneRepairById(id)
 

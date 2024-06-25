@@ -31,4 +31,30 @@ export class UserService {
       throw CustomError.internalServer('Internal Server Error')
     }
   }
+
+  async findAllUsers() {
+
+    try {
+      return await Users.find()
+    } catch (error: any) {
+      throw CustomError.internalServer('Internal Server Error')
+    }
+  }
+
+  async findOneUserById(id: number) {
+
+    const repair = await Users.findOne({
+      where: {
+        id: id,
+        status: Status.DISABLED
+      }
+    })
+
+    if (!repair) {
+      throw CustomError.notFound(`User with id ${id} not found`)
+    }
+
+    return repair
+
+  }
 }

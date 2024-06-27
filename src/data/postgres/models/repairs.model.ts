@@ -20,6 +20,7 @@ export class Repairs extends BaseEntity {
   date: string
 
   @Column({
+    type: 'enum',
     nullable: false,
     enum: Status,
     default: Status.PENDING

@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { UserService } from "../services/user.service"
-import { CreateUserDto, CustomError, UpdateUserDto } from "../../domain"
+import { RegisterUserDto, CustomError, UpdateUserDto } from "../../domain"
 
 
 export class UsersController {
@@ -18,8 +18,16 @@ export class UsersController {
     return res.status(500).json({ message: 'Something went very wrong' })
   }
 
+  register = async (req: Request, res: Response) => {
+    return res.status(200).json({ message: 'Hello World' })
+  }
+
+  login = async (req: Request, res: Response) => {
+    return res.status(200).json({ message: 'Hello World' })
+  }
+
   createUser = (req: Request, res: Response) => {
-    const [error, createUserDto] = CreateUserDto.create(req.body)
+    const [error, createUserDto] = RegisterUserDto.create(req.body)
     if (error) return res.status(422).json({ message: error })
 
     this.userService.createUser(createUserDto!)

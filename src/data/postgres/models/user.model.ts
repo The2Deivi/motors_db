@@ -26,7 +26,7 @@ export class Users extends BaseEntity {
   @Column({
     type: 'varchar',
     nullable: false,
-    length: 255
+    length: 100
   })
   email: string
 
@@ -38,14 +38,14 @@ export class Users extends BaseEntity {
   password: string
 
   @Column({
-    nullable: false,
+    type: 'enum',
     enum: Role,
     default: Role.CLIENT
   })
   role: Role
 
   @Column({
-    nullable: false,
+    type: 'enum',
     enum: Status,
     default: Status.AVAILABLE
   })

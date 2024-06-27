@@ -1,5 +1,5 @@
 import { Users } from "../../data"
-import { CreateUserDto, CustomError, UpdateUserDto } from "../../domain"
+import { RegisterUserDto, CustomError, UpdateUserDto } from "../../domain"
 
 enum Status {
   AVAILABLE = 'AVAILABLE',
@@ -16,7 +16,7 @@ export class UserService {
   constructor() {
   }
 
-  async createUser(userData: CreateUserDto) {
+  async createUser(userData: RegisterUserDto) {
     const user = new Users()
 
     user.name = userData.name.toLowerCase().trim()

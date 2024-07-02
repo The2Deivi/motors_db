@@ -1,7 +1,7 @@
 import { bcryptAdapter, envs } from "../../config"
 import { JwtAdapter } from "../../config/jwt.adapter"
 import { Users } from "../../data"
-import { RegisterUserDto, CustomError, UpdateUserDto } from "../../domain"
+import { RegisterUserDto, CustomError, UpdateUserDto, LoginUserDto } from "../../domain"
 import { EmailService } from "./email.service"
 
 enum Status {
@@ -47,11 +47,39 @@ export class UserService {
 
       return {
         user,
-        token,
+        //token,
       }
 
     } catch (error: any) {
       throw CustomError.internalServer(error)
+    }
+  }
+
+  public async login(loginUserDto: LoginUserDto) {
+    // 1. Buscar que exista el usuario
+    const user = await Users.findOne({
+      where: {
+        email: loginUserDto.email,
+        status: Status.AVAILABLE
+      }
+    })
+    if (!user) throw CustomError.unAuthorized('Invalid credentials')
+    // 2. Validar la contraseña
+    const isMatching = bcryptAdapter.compare(loginUserDto.password, user.password)
+    if (!isMatching) throw CustomError.unAuthorized('Invalid credentials')
+    // 3. Generar el token
+    const token = await JwtAdapter.generateToken({ id: user.id })
+    if (!token) throw CustomError.internalServer('Error while creating JWT')
+    // 4. enviar información del usuario al cliente
+    return {
+      token: token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      }
     }
   }
 

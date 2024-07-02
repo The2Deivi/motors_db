@@ -44,7 +44,14 @@ export class UsersController {
       .then(() => res.json('Email was validated properly'))
       .catch((error) => this.handleError(error, res))
 
-    return res.status(200).json({ message: 'Hello World' })
+  }
+
+  getProfile = async (req: Request, res: Response) => {
+    const { id } = req.body.sessionUser
+
+    this.userService.getProfile(+id)
+      .then(data => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res))
   }
 
   findAllUsers = (req: Request, res: Response) => {

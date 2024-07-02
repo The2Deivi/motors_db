@@ -15,7 +15,7 @@ export class PostgresDatabase {
 
   private datasource: DataSource
 
-  constructor(options: Options){
+  constructor(options: Options) {
     this.datasource = new DataSource({
       type: 'postgres',
       host: options.host,
@@ -35,7 +35,7 @@ export class PostgresDatabase {
   async connect() {
     try {
       await this.datasource.initialize()
-      console.log('Connected to database')
+      console.log('Connected to database 👍')
     } catch (error) {
       console.log(error)
     }

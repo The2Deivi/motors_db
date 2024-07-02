@@ -15,7 +15,6 @@ export class Repairs extends BaseEntity {
   @Column({
     nullable: false,
     type: 'timestamp',
-    length: 120
   })
   date: string
 

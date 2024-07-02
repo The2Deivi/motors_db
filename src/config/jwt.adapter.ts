@@ -12,7 +12,7 @@ export class JwtAdapter {
       }, (err, token) => {
         if (err) return resolve(null)
 
-        return (token)
+        resolve(token)
       })
     })
   }

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { RepairsController } from "./controller";
 import { RepairsService } from "../services/repairs.service";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
 
 
 export class RepairsRoutes {
@@ -10,6 +11,8 @@ export class RepairsRoutes {
 
     const repairService = new RepairsService()
     const controller = new RepairsController(repairService)
+
+    router.use(AuthMiddleware.protect)
 
     router.get('/', controller.findAllRepairs)
     router.post('/', controller.createRepair)

@@ -60,7 +60,8 @@ export class UserService {
     const user = await Users.findOne({
       where: {
         email: loginUserDto.email,
-        status: Status.AVAILABLE
+        status: Status.AVAILABLE,
+        emailValidated: true
       }
     })
     if (!user) throw CustomError.unAuthorized('Invalid credentials')
@@ -81,6 +82,10 @@ export class UserService {
         status: user.status,
       }
     }
+  }
+
+  public async getProfile(id: number) {
+
   }
 
   public sendEmailValidationLink = async (email: string) => {

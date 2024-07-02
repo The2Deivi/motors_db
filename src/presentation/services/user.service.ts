@@ -1,5 +1,8 @@
+import { bcryptAdapter, envs } from "../../config"
+import { JwtAdapter } from "../../config/jwt.adapter"
 import { Users } from "../../data"
 import { RegisterUserDto, CustomError, UpdateUserDto } from "../../domain"
+import { EmailService } from "./email.service"
 
 enum Status {
   AVAILABLE = 'AVAILABLE',
@@ -13,21 +16,87 @@ enum Role {
 
 export class UserService {
 
-  constructor() {
+  constructor(
+    private readonly emailService: EmailService
+  ) {
   }
 
-  async createUser(userData: RegisterUserDto) {
-    const user = new Users()
+  public async createUser(registerUserDto: RegisterUserDto) {
+    const existerUser = await Users.findOne({
+      where: {
+        status: Status.AVAILABLE,
+        email: registerUserDto.email
+      }
+    })
 
-    user.name = userData.name.toLowerCase().trim()
-    user.email = userData.email.toLowerCase().trim()
-    user.password = userData.password.trim()
-    user.role = Role.CLIENT
+    if (existerUser) throw CustomError.badRequest('Email already exists')
+
+    const user = new Users()
+    user.name = registerUserDto.name
+    user.email = registerUserDto.email
+    user.password = bcryptAdapter.hash(registerUserDto.password)
+
 
     try {
-      return await user.save()
+      await user.save()
+
+      await this.sendEmailValidationLink(user.email)
+
+      const token = await JwtAdapter.generateToken({ id: user.id })
+      if (!token) throw CustomError.internalServer('Error while generating JWT token')
+
+      return {
+        user,
+        token,
+      }
+
+    } catch (error: any) {
+      throw CustomError.internalServer(error)
+    }
+  }
+
+  public sendEmailValidationLink = async (email: string) => {
+    const token = await JwtAdapter.generateToken({ email })
+    if (!token) throw CustomError.internalServer('Error getting token')
+
+    const link = `${envs.WEBSERVICE_URL}/auth/validate-email/${token}`
+    const html = `
+        <h1>Validate your email</h1>
+        <p>Click the link below to validate your email</p>
+        <a href="${link}">Validate your email: ${email}</a>
+      `
+
+    const isSent = this.emailService.sendEmail({
+      to: email,
+      subject: 'Validate your email',
+      htmlBody: html
+    })
+    if (!isSent) throw CustomError.internalServer('Error sending email')
+
+    return true
+  }
+
+  public validateEmail = async (token: string) => {
+    const payload = await JwtAdapter.validateToken(token)
+    if (!payload) throw CustomError.unAuthorized('Invalid token')
+
+    const { email } = payload as { email: string }
+    if (!email) throw CustomError.internalServer('Email not in token')
+
+    const user = await Users.findOne({
+      where: {
+        email: email
+      }
+    })
+    if (!user) throw CustomError.internalServer('Email not exist')
+
+    user.emailValidated = true
+    try {
+      await user.save()
+
+      return true
     } catch (error) {
-      throw CustomError.internalServer('Internal Server Error')
+      throw CustomError.internalServer('Something went very wrong')
     }
   }
 

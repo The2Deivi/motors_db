@@ -18,21 +18,28 @@ export class UsersController {
     return res.status(500).json({ message: 'Something went very wrong' })
   }
 
+
   register = async (req: Request, res: Response) => {
-    return res.status(200).json({ message: 'Hello World' })
+    const [error, registerUserDto] = RegisterUserDto.create(req.body)
+    if (error) return res.status(422).json({ message: error })
+
+    this.userService.createUser(registerUserDto!)
+      .then(data => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res))
   }
 
   login = async (req: Request, res: Response) => {
     return res.status(200).json({ message: 'Hello World' })
   }
 
-  createUser = (req: Request, res: Response) => {
-    const [error, createUserDto] = RegisterUserDto.create(req.body)
-    if (error) return res.status(422).json({ message: error })
+  validateEmail = async (req: Request, res: Response) => {
+    const { token } = req.params
 
-    this.userService.createUser(createUserDto!)
-      .then((user) => res.status(201).json(user))
-      .catch((error: any) => this.handleError(error, res))
+    this.userService.validateEmail(token)
+      .then(() => res.json('Email was validated properly'))
+      .catch((error) => this.handleError(error, res))
+
+    return res.status(200).json({ message: 'Hello World' })
   }
 
   findAllUsers = (req: Request, res: Response) => {

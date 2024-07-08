@@ -36,9 +36,7 @@ export class RepairsController {
 
   findOneRepair = (req: Request, res: Response) => {
     const { id } = req.params
-    if (isNaN(+id)) {
-      res.status(400).json({ message: 'El id debe ser numerico' })
-    }
+    if (isNaN(+id)) return res.status(400).json({ message: 'El id debe ser numerico' })
 
     this.repairService.findOneRepairById(+id)
       .then(repair => res.status(200).json(repair))
@@ -63,12 +61,10 @@ export class RepairsController {
   deleteRepair = (req: Request, res: Response) => {
     const { id } = req.params
 
-    if (isNaN(+id)) {
-      return res.status(400).json({ message: 'El id debe se un numero' })
-    }
+    if (isNaN(+id)) return res.status(400).json({ message: 'El id debe se un numero' })
 
     this.repairService.deleteRepair(+id)
-      .then(() => res.status(204).json())
+      .then(() => res.status(204).json(null))
       .catch((error: any) => res.status(500).json(error))
   }
 }

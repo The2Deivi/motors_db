@@ -85,7 +85,16 @@ export class UserService {
   }
 
   public async getProfile(id: number) {
+    const user = await Users.findOne({
+      where: {
+        id: id,
+        status: Status.AVAILABLE
+      }
+    })
 
+    if (!user) throw CustomError.notFound('User not found')
+
+    return user
   }
 
   public sendEmailValidationLink = async (email: string) => {

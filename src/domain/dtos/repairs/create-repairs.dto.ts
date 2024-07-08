@@ -12,6 +12,7 @@ export class CreateRepairDto {
 
     if (!date) return ['Missing date', undefined]
     if (!userId) return ['Missing userId']
+    if (typeof userId !== 'number') return ['userId must be a number']
 
     return [undefined, new CreateRepairDto(date, userId)]
   }

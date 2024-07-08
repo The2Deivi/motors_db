@@ -19,6 +19,19 @@ export class Repairs extends BaseEntity {
   date: string
 
   @Column({
+    nullable: false,
+    type: 'int'
+  })
+
+  motorsNumber: number
+
+  @Column({
+    nullable: false,
+    type: 'text',
+  })
+  description: string;
+
+  @Column({
     type: 'enum',
     nullable: false,
     enum: Status,

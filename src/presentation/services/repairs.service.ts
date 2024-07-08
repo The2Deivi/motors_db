@@ -1,5 +1,6 @@
 import { Repairs } from "../../data"
 import { CreateRepairDto, CustomError, UpdateRepairDto } from "../../domain"
+import { UserService } from "./user.service"
 
 
 enum Status {
@@ -10,15 +11,22 @@ enum Status {
 
 export class RepairsService {
 
-  constructor() {
+  constructor(
+    private readonly userService: UserService,
+  ) {
   }
 
-  async createRepair(repairData: CreateRepairDto) {
+  async createRepair(createRepairDto: CreateRepairDto) {
+
+    const userPromise = this.userService.findOneUserById(createRepairDto.userId)
+
+    await Promise.all([userPromise])
+
     const repair = new Repairs()
 
-    repair.date = repairData.date
+    repair.date = createRepairDto.date
     repair.status = Status.PENDING
-    repair.userid = repairData.userId
+    repair.userid = createRepairDto.userId
 
     try {
       return await repair.save()
@@ -57,7 +65,7 @@ export class RepairsService {
 
   }
 
-  async updateRepair(repairData: UpdateRepairDto, id: number) {
+  async updateRepair(createRepairDto: UpdateRepairDto, id: number) {
 
     const repair = await this.findOneRepairById(id)
 

@@ -59,11 +59,12 @@ export class RepairsController {
   }
 
   deleteRepair = (req: Request, res: Response) => {
+    const userId = req.body.sessionUser.id
     const { id } = req.params
 
     if (isNaN(+id)) return res.status(400).json({ message: 'El id debe se un numero' })
 
-    this.repairService.deleteRepair(+id)
+    this.repairService.deleteRepair(+id, userId)
       .then(() => res.status(204).json(null))
       .catch((error: any) => res.status(500).json(error))
   }

@@ -34,7 +34,7 @@ export class UserService {
     const user = new Users()
     user.name = registerUserDto.name
     user.email = registerUserDto.email
-    user.password = bcryptAdapter.hash(registerUserDto.password)
+    user.password = registerUserDto.password
 
 
     try {

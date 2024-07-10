@@ -1,3 +1,4 @@
+import { protectAccountOwner } from "../../config/validate-owner"
 import { Repairs } from "../../data"
 import { CreateRepairDto, CustomError, UpdateRepairDto } from "../../domain"
 import { UserService } from "./user.service"
@@ -65,7 +66,7 @@ export class RepairsService {
 
   }
 
-  async updateRepair(createRepairDto: UpdateRepairDto, id: number) {
+  async updateRepair(updateRepairDto: UpdateRepairDto, id: number) {
 
     const repair = await this.findOneRepairById(id)
 
@@ -78,8 +79,11 @@ export class RepairsService {
     }
   }
 
-  async deleteRepair(id: number) {
+  async deleteRepair(id: number, userSessionId: number) {
     const repair = await this.findOneRepairById(id)
+
+    const isOwner = protectAccountOwner(repair.userid, userSessionId)
+    if (!isOwner) throw CustomError.unAuthorized('You are not the owner of this repair')
 
     repair.status = Status.CANCELLED
 

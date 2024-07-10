@@ -6,7 +6,10 @@ import { UserService } from "../services/user.service";
 import { EmailService } from "../services/email.service";
 import { envs } from "../../config";
 
-
+enum Role {
+  CLIENT = 'CLIENT',
+  EMPLOYEE = 'EMPLOYEE'
+}
 export class RepairsRoutes {
 
   static get routes(): Router {
@@ -26,7 +29,7 @@ export class RepairsRoutes {
 
     router.use(AuthMiddleware.protect)
 
-    router.get('/', controller.findAllRepairs)
+    router.get('/', AuthMiddleware.restrictTo(Role.EMPLOYEE), controller.findAllRepairs)
     router.post('/', controller.createRepair)
     router.get('/:id', controller.findOneRepair)
     router.patch('/:id', controller.updateRepair)

@@ -89,6 +89,15 @@ export class UserService {
       where: {
         id: id,
         status: Status.AVAILABLE
+      },
+      relations: ['repairs', 'repairs.user'],
+      select: {
+        repairs: {
+          motorsNumber: true,
+          description: true,
+          status: true,
+          date: true
+        }
       }
     })
 

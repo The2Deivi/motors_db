@@ -1,5 +1,7 @@
 import express, { Router } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import hpp from 'hpp';
 
 interface Options {
   port: number;
@@ -37,11 +39,13 @@ export class Server {
         return callback(new Error('Not allowed by CORS'))
       }
     }))
+    this.app.use(helmet())
+    this.app.use(hpp())
 
     this.app.use(this.routes)
 
     this.serverListener = this.app.listen(this.port, () => {
-      console.log(`Server is running on port ${this.port}`)
+      console.log(`Server is running on port ${this.port} ✔️`)
     })
   }
 }

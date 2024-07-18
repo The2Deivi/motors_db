@@ -21,13 +21,13 @@ export class RepairsService {
 
     const userPromise = this.userService.findOneUserById(createRepairDto.userId)
 
-    await Promise.all([userPromise])
+    const [user] = await Promise.all([userPromise])
 
     const repair = new Repairs()
 
     repair.date = createRepairDto.date
     repair.status = Status.PENDING
-    repair.userid = createRepairDto.userId
+    repair.user = user
 
     try {
       return await repair.save()
@@ -55,6 +55,15 @@ export class RepairsService {
       where: {
         id: id,
         status: Status.PENDING
+      },
+      relations: ['user'],
+      select: {
+        user: {
+          id: true,
+          name: true,
+          email: true,
+          role: true
+        }
       }
     })
 
@@ -82,13 +91,13 @@ export class RepairsService {
   async deleteRepair(id: number, userSessionId: number) {
     const repair = await this.findOneRepairById(id)
 
-    const isOwner = protectAccountOwner(repair.userid, userSessionId)
+    const isOwner = protectAccountOwner(repair.user.id, userSessionId)
     if (!isOwner) throw CustomError.unAuthorized('You are not the owner of this repair')
 
     repair.status = Status.CANCELLED
 
     try {
-      await repair.save()
+      return await repair.save()
     } catch (error) {
       throw CustomError.internalServer('Something went very wrong')
     }

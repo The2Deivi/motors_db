@@ -21,7 +21,7 @@ export class UserService {
   ) {
   }
 
-  public async createUser(registerUserDto: RegisterUserDto) {
+  public async createUser(registerUserDto: RegisterUserDto, file: Express.Multer.File | undefined) {
     const existerUser = await Users.findOne({
       where: {
         status: Status.AVAILABLE,

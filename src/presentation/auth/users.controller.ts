@@ -23,7 +23,7 @@ export class UsersController {
     const [error, registerUserDto] = RegisterUserDto.create(req.body)
     if (error) return res.status(422).json({ message: error })
 
-    this.userService.createUser(registerUserDto!)
+    this.userService.createUser(registerUserDto!, req.file)
       .then(data => res.status(200).json(data))
       .catch((error) => this.handleError(error, res))
   }

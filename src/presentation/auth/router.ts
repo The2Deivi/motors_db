@@ -4,6 +4,7 @@ import { UserService } from "../services/user.service";
 import { EmailService } from "../services/email.service";
 import { envs } from "../../config";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { uploadSingle } from "../../config/upload-files.adapter";
 
 
 export class UsersRoutes {
@@ -22,7 +23,7 @@ export class UsersRoutes {
     const controller = new UsersController(userService)
 
     router.post('/login', controller.login)
-    router.post('/register', controller.register)
+    router.post('/register', uploadSingle('avatar'), controller.register)
     router.get('/validate-email/:token', controller.validateEmail)
     router.get('/profile', AuthMiddleware.protect, controller.getProfile)
     router.get('/', controller.findAllUsers)
